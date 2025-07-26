@@ -4,9 +4,8 @@
     let { times, currentTime, showAsTitle = false }: { times: EntryTimeModel[], currentTime: Date, showAsTitle?: boolean } = $props();
 
     let time = $derived.by(() => {
-        let sortedTimes = times.sort((a, b) => a.time.getTime() - b.time.getTime());
         let combinedTimes: { start: Date; end: Date }[] = [];
-        for (const time of sortedTimes) {
+        for (const time of times) {
             if (time.type === 'start') {
                 combinedTimes.push({ start: time.time, end: currentTime });
             } else if (combinedTimes.length > 0) {
