@@ -7,13 +7,16 @@
         let combinedTimes: { start: Date; end: Date }[] = [];
         for (const time of times) {
             if (time.type === 'start') {
-                combinedTimes.push({ start: time.time, end: currentTime });
+                combinedTimes.push({ start: new Date(time.time), end: currentTime });
             } else if (combinedTimes.length > 0) {
-                combinedTimes[combinedTimes.length - 1].end = time.time;
+                combinedTimes[combinedTimes.length - 1].end = new Date(time.time);
             }
         }
         let totalDuration = 0;
         for (const combinedTime of combinedTimes) {
+            if (!combinedTime?.start || !combinedTime.end) {
+                continue;
+            }
             totalDuration += combinedTime.end.getTime() - combinedTime.start.getTime();
         }
         return totalDuration;
