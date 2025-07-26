@@ -1,15 +1,66 @@
 <script lang="ts">
+    import { invalidateAll } from '$app/navigation';
+    import Button from '$lib/Button.svelte';
+    import EntryConfiguration from '$lib/Configuration/EntryConfiguration.svelte';
 	import Headline from '$lib/Headline.svelte';
     import Viewer from '$lib/Viewer/Viewer.svelte';
+
+	let { data } = $props();
+    let challenge = $state(data.challenge || { entries: [] });
+    $effect(() => {
+        if (data.challenge) {
+            challenge = data.challenge;
+        }
+    });
+
+    function addEntry() {
+        challenge.entries.push({
+            title: 'New Entry',
+            description: 'Description of new entry',
+            times: []
+        });
+    }
+
+    async function onnewtimer(index: number) {
+        const entry = challenge.entries[index];
+        if (entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start') {
+            entry.times.push({ time: new Date(), type: 'end' });
+        } else {
+            entry.times.push({ time: new Date(), type: 'start' });
+        }
+        await saveConfiguration();
+    }
+    
+    function ondelete(index: number) {
+        challenge.entries.splice(index, 1);
+    }
+
+    async function saveConfiguration() {
+        await fetch('/win-challenge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(challenge)
+        });
+    }
 </script>
 
-<Headline title="Configuration" />
+<div class="float-left">
+    <Headline title="Configuration" />
+</div>
+<div class="float-right">
+    <Button onclick={saveConfiguration}>Save</Button>
+</div>
 
-<div id="layout" class="flex flex-row w-full">
-    <div id="configuration-content" class="flex-1 p-4">
-        <h2 class="text-xl font-bold mb-4">Configuration Section</h2>
+<div id="layout" class="flex flex-row w-full gap-4 mt-14">
+    <div id="configuration-content" class="flex-1">
+        {#each challenge.entries as entry, i}
+            <EntryConfiguration bind:entry={challenge.entries[i]} {onnewtimer} {ondelete} index={i} />
+        {/each}
+        <Button onclick={addEntry}>Add entry</Button>
     </div>
-    <div id="viewer-content" class="p-4 bg-gray-400 flex-0 rounded-lg shadow-lg">
-        <Viewer />
+    <div id="viewer-content" class="flex-0">
+        <Viewer entries={challenge.entries} />
     </div>
 </div>
