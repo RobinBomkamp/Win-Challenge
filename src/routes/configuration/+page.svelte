@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
     import Button from '$lib/Button.svelte';
     import EntryConfiguration from '$lib/Configuration/EntryConfiguration.svelte';
 	import Headline from '$lib/Headline.svelte';
@@ -28,11 +27,28 @@
         } else {
             entry.times.push({ time: new Date(), type: 'start' });
         }
+
+        challenge.entries.forEach((x, i) => {
+            if (x.times.length === 0 || i === index) {
+                return;
+            }
+            if (x.times[x.times.length - 1]?.type === 'start') {
+                console.log('Adding end time for entry:', x.title);
+                x.times.push({ time: new Date(), type: 'end' });
+            }
+        });
         await saveConfiguration();
     }
     
     function ondelete(index: number) {
         challenge.entries.splice(index, 1);
+    }
+
+    async function resetTimer() {
+        for (const entry of challenge.entries) {
+            entry.times = [];
+        }
+        await saveConfiguration();
     }
 
     async function saveConfiguration() {
@@ -50,6 +66,7 @@
     <Headline title="Configuration" />
 </div>
 <div class="float-right">
+    <Button onclick={resetTimer}>Reset</Button>
     <Button onclick={saveConfiguration}>Save</Button>
 </div>
 
