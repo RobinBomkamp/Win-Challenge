@@ -70,7 +70,7 @@
     <Button onclick={saveConfiguration}>Save</Button>
 </div>
 
-<div id="layout" class="flex flex-row w-full gap-4 mt-14">
+<div id="layout" class="flex flex-row w-full gap-4 mt-14 h-[calc(100vh-6rem)] overflow-auto">
     <div id="configuration-content" class="flex-1">
         {#each challenge.entries as entry, i}
             <EntryConfiguration bind:entry={challenge.entries[i]} {onnewtimer} {ondelete} index={i} />

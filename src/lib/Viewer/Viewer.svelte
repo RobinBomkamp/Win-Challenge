@@ -13,9 +13,13 @@
     });
 </script>
 
-<div class="rounded-lg shadow-lg bg-gray-800 overflow-hidden mx-auto max-w-2xl min-w-md">
-    <Title {entries} {currentTime} />
-    {#each entries as entry}
-        <Entry {entry} {currentTime}/>
-    {/each}
+<div class="rounded-lg shadow-lg bg-gray-800 mx-auto max-w-2xl min-w-md flex flex-col max-h-[100%] overflow-hidden">
+    <div class="flex-shrink-0">
+        <Title {entries} {currentTime} />
+    </div>
+    <div class="flex-1 overflow-y-auto min-h-0">
+        {#each entries as entry}
+            <Entry {entry} {currentTime}/>
+        {/each}
+    </div>
 </div>
