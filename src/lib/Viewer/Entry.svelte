@@ -75,10 +75,19 @@
         return '';
     });
 
+    let estimatedDelta = $derived.by(() => {
+        return estimatedDuration - currentDuration;
+    });
+
+    let estimatedDeltaPrefix = $derived.by(() => {
+        return estimatedDelta >= 0 ? '-' : '+';
+    });
+
     function formatDuration(durationInMs: number): string {
-        const hour = Math.floor(durationInMs / 3600 / 1000);
-        const minute = Math.floor((durationInMs % (3600 * 1000)) / 60000);
-        const second = Math.floor((durationInMs % 60000) / 1000);
+        const safeDuration = Math.max(0, Math.abs(durationInMs));
+        const hour = Math.floor(safeDuration / 3600 / 1000);
+        const minute = Math.floor((safeDuration % (3600 * 1000)) / 60000);
+        const second = Math.floor((safeDuration % 60000) / 1000);
         return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
     }
 </script>
@@ -102,9 +111,9 @@
             </div>
         </div>
         <div class="flex flex-col items-end">
-            <Time times={entry.times} {currentTime} textClass={runningTimeColorClass} />
+            <Time times={entry.times} {currentTime} />
             {#if estimatedDuration > 0}
-            <p class="text-sm text-gray-300">Est. {formatDuration(estimatedDuration)}</p>
+            <p class="text-sm text-gray-300 {runningTimeColorClass}">{estimatedDeltaPrefix} {formatDuration(estimatedDelta)}</p>
             {/if}
         </div>
     </div>
