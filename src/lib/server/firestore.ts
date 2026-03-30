@@ -18,8 +18,24 @@ export async function getWinChallenges(): Promise<WinChallenge[]> {
         }
 
         challenge.entries.forEach(entry => {
+            const parsedRequiredRounds = Number(entry.requiredRounds ?? 1);
+            const safeRequiredRounds = Number.isFinite(parsedRequiredRounds) ? Math.max(1, Math.floor(parsedRequiredRounds)) : 1;
+
+            const defaultCompletedRounds = entry.completed ? safeRequiredRounds : 0;
+            const parsedCompletedRounds = Number(entry.completedRounds ?? defaultCompletedRounds);
+            const safeCompletedRounds = Number.isFinite(parsedCompletedRounds)
+                ? Math.min(safeRequiredRounds, Math.max(0, Math.floor(parsedCompletedRounds)))
+                : defaultCompletedRounds;
+
+            entry.requiredRounds = safeRequiredRounds;
+            entry.completedRounds = safeCompletedRounds;
+
             if (entry.completed === undefined) {
-                entry.completed = false;
+                entry.completed = safeCompletedRounds >= safeRequiredRounds;
+            }
+
+            if (entry.completed) {
+                entry.completedRounds = safeRequiredRounds;
             }
         });
     });

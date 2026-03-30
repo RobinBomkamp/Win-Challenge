@@ -31,6 +31,27 @@
         return Math.max(0, (entry.estimtaedTime ?? -1) * 60 * 1000);
     });
 
+    let requiredRounds = $derived.by(() => {
+        const parsedValue = Number(entry.requiredRounds ?? 1);
+        return Number.isFinite(parsedValue) ? Math.max(1, Math.floor(parsedValue)) : 1;
+    });
+
+    let completedRounds = $derived.by(() => {
+        const parsedValue = Number(entry.completedRounds ?? 0);
+        if (!Number.isFinite(parsedValue)) {
+            return 0;
+        }
+        return Math.min(requiredRounds, Math.max(0, Math.floor(parsedValue)));
+    });
+
+    let progressPercent = $derived.by(() => {
+        return Math.max(0, Math.min(100, (completedRounds / requiredRounds) * 100));
+    });
+
+    let cardStyle = $derived.by(() => {
+        return `background: linear-gradient(90deg, rgba(74, 222, 128, 0.24) 0%, rgba(74, 222, 128, 0.24) ${progressPercent}%, rgba(31, 41, 55, 1) ${progressPercent}%, rgba(31, 41, 55, 1) 100%);`;
+    });
+
     let runningTimeColorClass = $derived.by(() => {
         if (estimatedDuration <= 0) {
             return '';
@@ -52,7 +73,7 @@
     }
 </script>
 
-<div class={`flex flex-row justify-between p-4 ${entry.completed ? 'bg-green-900/35' : 'bg-gray-800'}`}>
+<div class="flex flex-row justify-between p-4" style={cardStyle}>
     <div>
         <p>{entry.title}</p>
         {#if entry.description !== ""}
