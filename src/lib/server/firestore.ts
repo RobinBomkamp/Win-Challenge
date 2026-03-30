@@ -16,6 +16,12 @@ export async function getWinChallenges(): Promise<WinChallenge[]> {
         if (!challenge.entries) {
             challenge.entries = [];
         }
+
+        challenge.entries.forEach(entry => {
+            if (entry.completed === undefined) {
+                entry.completed = false;
+            }
+        });
     });
 
     return challenges;

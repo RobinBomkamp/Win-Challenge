@@ -52,7 +52,7 @@
     }
 </script>
 
-<div class="flex flex-row justify-between p-4 bg-gray-800">
+<div class={`flex flex-row justify-between p-4 ${entry.completed ? 'bg-green-900/35' : 'bg-gray-800'}`}>
     <div>
         <p>{entry.title}</p>
         {#if entry.description !== ""}

@@ -3,6 +3,7 @@ export class EntryModel {
     description?: string = '';
     times: EntryTimeModel[] = [];
     estimtaedTime?: number = -1;
+    completed?: boolean = false;
 }
 
 export class EntryTimeModel {

@@ -16,12 +16,16 @@
         challenge.entries.push({
             title: 'New Entry',
             description: 'Description of new entry',
-            times: []
+            times: [],
+            completed: false
         });
     }
 
     async function onnewtimer(index: number) {
         const entry = challenge.entries[index];
+        if (entry.completed) {
+            return;
+        }
         if (entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start') {
             entry.times.push({ time: new Date(), type: 'end' });
         } else {
@@ -37,6 +41,19 @@
                 x.times.push({ time: new Date(), type: 'end' });
             }
         });
+        await saveConfiguration();
+    }
+
+    async function oncomplete(index: number) {
+        const entry = challenge.entries[index];
+        const becomesCompleted = !entry.completed;
+        entry.completed = becomesCompleted;
+
+        // Auto-close a running timer when an entry gets completed.
+        if (becomesCompleted && entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start') {
+            entry.times.push({ time: new Date(), type: 'end' });
+        }
+
         await saveConfiguration();
     }
     
@@ -73,7 +90,7 @@
 <div id="layout" class="flex flex-row w-full gap-4 mt-14 h-[calc(100vh-6rem)] overflow-auto">
     <div id="configuration-content" class="flex-1">
         {#each challenge.entries as entry, i}
-            <EntryConfiguration bind:entry={challenge.entries[i]} {onnewtimer} {ondelete} index={i} />
+            <EntryConfiguration bind:entry={challenge.entries[i]} {onnewtimer} {ondelete} {oncomplete} index={i} />
         {/each}
         <Button onclick={addEntry}>Add entry</Button>
     </div>
