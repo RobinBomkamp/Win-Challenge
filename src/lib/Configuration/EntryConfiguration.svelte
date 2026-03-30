@@ -2,7 +2,7 @@
     import Button from '$lib/Button.svelte';
     import Input from '$lib/Input.svelte';
 
-    let { entry = $bindable(), onnewtimer, ondelete, oncomplete, onprogress, index } = $props();
+    let { entry = $bindable(), onnewtimer, ondelete, oncomplete, onprogress, onprogressdown, index } = $props();
 
     let isActive = $derived(() => {
         return entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start';
@@ -30,26 +30,34 @@
     });
 </script>
 
-<div class="flex flex-row p-4 gap-4 rounded-lg shadow-lg mb-4" style={cardStyle}>
-    <div class="flex flex-col gap-4 flex-auto">
-        <div class="flex flex-row gap-4 items-end">
-            <div class="flex-auto">
-                <Input label="Name" bind:value={entry.title} id="{index}-name"/>
+<div class="relative rounded-lg shadow-lg mb-4 bg-gray-700 overflow-hidden">
+    <div class="absolute inset-y-0 left-0 bg-green-400/25 transition-all duration-500 ease-out" style={`width: ${progressPercent}%;`}></div>
+    <div class="relative z-10 flex flex-row p-4 gap-4">
+        <div class="flex flex-col gap-4 flex-auto">
+            <div class="flex flex-row gap-4 items-end">
+                <div class="flex-auto">
+                    <Input label="Name" bind:value={entry.title} id="{index}-name"/>
+                </div>
+                <div class="w-30">
+                    <Input type="number" suffix="min" bind:value={entry.estimtaedTime} id="{index}-estimated-time"/>
+                </div>
             </div>
-            <div class="w-30">
-                <Input type="number" suffix="min" bind:value={entry.estimtaedTime} id="{index}-estimated-time"/>
+            <div class="flex flex-row gap-4 items-end">
+                <div class="flex-auto">
+                    <Input label="Description" bind:value={entry.description} id="{index}-description"/>
+                </div>
+                <div class="w-20">
+                    <Input type="number" suffix="x" bind:value={entry.requiredRounds} id="{index}-required-rounds"/>
+                </div>
             </div>
-            <div class="w-20">
-                <Input type="number" suffix="x" bind:value={entry.requiredRounds} id="{index}-required-rounds"/>
-            </div>
+            <p class="text-xs text-gray-200">Progress: {completedRounds}/{requiredRounds}</p>
         </div>
-        <Input label="Description" bind:value={entry.description} id="{index}-description"/>
-        <p class="text-xs text-gray-300">Progress: {completedRounds}/{requiredRounds}</p>
-    </div>
-    <div class="flex-[0_0_0] flex flex-col justify-between">
-        <Button onclick={() => onnewtimer(index)}>{entry.completed ? 'Closed' : isActive() ? 'Stop' : 'Start'}</Button>
-        <Button onclick={() => onprogress(index)}>{entry.completed ? 'Done' : '+1 Round'}</Button>
-        <Button onclick={() => oncomplete(index)}>{entry.completed ? 'Reopen' : 'Complete'}</Button>
-        <Button onclick={() => ondelete(index)}>Delete</Button>
+        <div class="flex-[0_0_0] flex flex-col justify-between">
+            <Button compact={true} onclick={() => onnewtimer(index)}>{entry.completed ? 'Closed' : isActive() ? 'Stop' : 'Start'}</Button>
+            <Button compact={true} onclick={() => onprogress(index)}>{entry.completed ? 'Done' : '+1 Round'}</Button>
+            <Button compact={true} onclick={() => onprogressdown(index)}>-1 Round</Button>
+            <Button compact={true} onclick={() => oncomplete(index)}>{entry.completed ? 'Reopen' : 'Complete'}</Button>
+            <Button compact={true} onclick={() => ondelete(index)}>Delete</Button>
+        </div>
     </div>
 </div>

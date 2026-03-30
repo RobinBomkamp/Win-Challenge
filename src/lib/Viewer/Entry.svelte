@@ -48,8 +48,14 @@
         return Math.max(0, Math.min(100, (completedRounds / requiredRounds) * 100));
     });
 
-    let cardStyle = $derived.by(() => {
-        return `background: linear-gradient(90deg, rgba(74, 222, 128, 0.24) 0%, rgba(74, 222, 128, 0.24) ${progressPercent}%, rgba(31, 41, 55, 1) ${progressPercent}%, rgba(31, 41, 55, 1) 100%);`;
+    let viewerCardClass = $derived.by(() => {
+        if (entry.completed) {
+            return 'bg-emerald-500/40 border-l-4 border-emerald-400';
+        }
+        if (progressPercent > 0) {
+            return 'bg-gray-800/85 border-l-4 border-emerald-600/70';
+        }
+        return 'bg-gray-800/85 border-l-4 border-transparent';
     });
 
     let runningTimeColorClass = $derived.by(() => {
@@ -73,17 +79,29 @@
     }
 </script>
 
-<div class="flex flex-row justify-between p-4" style={cardStyle}>
-    <div>
-        <p>{entry.title}</p>
-        {#if entry.description !== ""}
-        <p class="text-sm text-gray-400">{entry.description}</p>
-        {/if}
-    </div>
-    <div class="flex flex-col items-end">
-        <Time times={entry.times} {currentTime} textClass={runningTimeColorClass} />
-        {#if estimatedDuration > 0}
-        <p class="text-sm text-gray-300">Est. {formatDuration(estimatedDuration)}</p>
-        {/if}
+<div class="relative overflow-hidden">
+    {#if !entry.completed}
+        <div class="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 via-emerald-500/80 to-emerald-500/40 transition-all duration-500 ease-out" style={`width: ${progressPercent}%;`}></div>
+    {/if}
+    <div class={`relative z-10 flex flex-row justify-between p-4 transition-colors duration-300 ${viewerCardClass}`}>
+        <div class="flex flex-row gap-3">
+            {#if entry.completed}
+            <div class="pt-0.5 text-green-300 font-bold">✓</div>
+            {:else}
+            <div class="pt-0.5 text-gray-500 font-bold">•</div>
+            {/if}
+            <div>
+                <p>{entry.title}</p>
+                {#if entry.description !== ""}
+                <p class="text-sm text-gray-400">{entry.description}</p>
+                {/if}
+            </div>
+        </div>
+        <div class="flex flex-col items-end">
+            <Time times={entry.times} {currentTime} textClass={runningTimeColorClass} />
+            {#if estimatedDuration > 0}
+            <p class="text-sm text-gray-300">Est. {formatDuration(estimatedDuration)}</p>
+            {/if}
+        </div>
     </div>
 </div>

@@ -93,6 +93,16 @@
 
         await saveConfiguration();
     }
+
+    async function onprogressdown(index: number) {
+        const entry = challenge.entries[index];
+        normalizeEntry(entry);
+
+        entry.completedRounds = Math.max(0, (entry.completedRounds ?? 0) - 1);
+        normalizeEntry(entry);
+
+        await saveConfiguration();
+    }
     
     function ondelete(index: number) {
         challenge.entries.splice(index, 1);
@@ -128,7 +138,7 @@
 <div id="layout" class="flex flex-row w-full gap-4 mt-14 h-[calc(100vh-6rem)] overflow-auto">
     <div id="configuration-content" class="flex-1">
         {#each challenge.entries as entry, i}
-            <EntryConfiguration bind:entry={challenge.entries[i]} {onnewtimer} {ondelete} {oncomplete} {onprogress} index={i} />
+            <EntryConfiguration bind:entry={challenge.entries[i]} {onnewtimer} {ondelete} {oncomplete} {onprogress} {onprogressdown} index={i} />
         {/each}
         <Button onclick={addEntry}>Add entry</Button>
     </div>
