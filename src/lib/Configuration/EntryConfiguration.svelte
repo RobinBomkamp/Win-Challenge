@@ -50,14 +50,17 @@
                     <Input type="number" suffix="x" bind:value={entry.requiredRounds} id="{index}-required-rounds"/>
                 </div>
             </div>
-            <p class="text-xs text-gray-200">Progress: {completedRounds}/{requiredRounds}</p>
         </div>
-        <div class="flex-[0_0_0] flex flex-col justify-between">
-            <Button compact={true} onclick={() => onnewtimer(index)}>{entry.completed ? 'Closed' : isActive() ? 'Stop' : 'Start'}</Button>
-            <Button compact={true} onclick={() => onprogress(index)}>{entry.completed ? 'Done' : '+1 Round'}</Button>
-            <Button compact={true} onclick={() => onprogressdown(index)}>-1 Round</Button>
-            <Button compact={true} onclick={() => oncomplete(index)}>{entry.completed ? 'Reopen' : 'Complete'}</Button>
-            <Button compact={true} onclick={() => ondelete(index)}>Delete</Button>
+        <div class="flex-[0_0_0] flex flex-col gap-2 w-full">
+            <div class="flex flex-row gap-1 w-full">
+                <Button compact={true} onclick={() => onprogressdown(index)}>⏮</Button>
+                <Button compact={true} onclick={() => onnewtimer(index)}>{entry.completed ? '‐' : isActive() ? '⏸' : '▶'}</Button>
+                <Button compact={true} onclick={() => onprogress(index)}>⏭</Button>
+            </div>
+            <div class="flex flex-row gap-1 w-full">
+                <Button compact={true} onclick={() => oncomplete(index)}>✓</Button>
+                <Button compact={true} onclick={() => ondelete(index)}>✕</Button>
+            </div>
         </div>
     </div>
 </div>

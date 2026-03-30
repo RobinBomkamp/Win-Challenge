@@ -49,13 +49,17 @@
     });
 
     let viewerCardClass = $derived.by(() => {
+        const hasTime = currentDuration > 0 || entry.times.length > 0;
+        
+        if (!hasTime) {
+            return 'bg-gray-800/85';
+        }
+        
         if (entry.completed) {
             return 'bg-emerald-500/40 border-l-4 border-emerald-400';
         }
-        if (progressPercent > 0) {
-            return 'bg-gray-800/85 border-l-4 border-emerald-600/70';
-        }
-        return 'bg-gray-800/85 border-l-4 border-transparent';
+        
+        return 'bg-gray-800/85 border-l-4 border-emerald-600/70';
     });
 
     let runningTimeColorClass = $derived.by(() => {
