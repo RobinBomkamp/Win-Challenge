@@ -117,6 +117,8 @@
     async function resetTimer() {
         for (const entry of challenge.entries) {
             entry.times = [];
+            entry.completedRounds = 0;
+            entry.completed = false;
         }
         await saveConfiguration();
     }
