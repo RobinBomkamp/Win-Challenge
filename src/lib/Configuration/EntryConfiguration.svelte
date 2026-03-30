@@ -50,6 +50,10 @@
                     <Input type="number" suffix="x" bind:value={entry.requiredRounds} id="{index}-required-rounds"/>
                 </div>
             </div>
+            <label class="inline-flex items-center gap-2 text-sm text-gray-200">
+                <input type="checkbox" bind:checked={entry.independentStart} class="rounded border-gray-500 bg-gray-800" />
+                Independent Start
+            </label>
         </div>
         <div class="flex-[0_0_0] flex flex-col gap-2 w-full">
             <div class="flex flex-row gap-1 w-full">

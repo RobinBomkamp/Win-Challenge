@@ -18,6 +18,7 @@
         entry.requiredRounds = safeRequiredRounds;
         entry.completedRounds = safeCompletedRounds;
         entry.completed = safeCompletedRounds >= safeRequiredRounds;
+        entry.independentStart = !!entry.independentStart;
     }
 
     function initializeChallenge(source: any) {
@@ -35,7 +36,8 @@
             times: [],
             completed: false,
             requiredRounds: 1,
-            completedRounds: 0
+            completedRounds: 0,
+            independentStart: false
         });
     }
 
@@ -44,21 +46,25 @@
         if (entry.completed) {
             return;
         }
-        if (entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start') {
+        const isEntryRunning = entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start';
+
+        if (isEntryRunning) {
             entry.times.push({ time: new Date(), type: 'end' });
         } else {
             entry.times.push({ time: new Date(), type: 'start' });
         }
 
-        challenge.entries.forEach((x: any, i: number) => {
-            if (x.times.length === 0 || i === index) {
-                return;
-            }
-            if (x.times[x.times.length - 1]?.type === 'start') {
-                console.log('Adding end time for entry:', x.title);
-                x.times.push({ time: new Date(), type: 'end' });
-            }
-        });
+        // Only when starting a non-independent entry, stop other running non-independent entries.
+        if (!isEntryRunning && !entry.independentStart) {
+            challenge.entries.forEach((x: any, i: number) => {
+                if (i === index || x.times.length === 0 || x.independentStart) {
+                    return;
+                }
+                if (x.times[x.times.length - 1]?.type === 'start') {
+                    x.times.push({ time: new Date(), type: 'end' });
+                }
+            });
+        }
         await saveConfiguration();
     }
 

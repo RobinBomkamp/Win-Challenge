@@ -37,6 +37,10 @@ export async function getWinChallenges(): Promise<WinChallenge[]> {
             if (entry.completed) {
                 entry.completedRounds = safeRequiredRounds;
             }
+
+            if (entry.independentStart === undefined) {
+                entry.independentStart = false;
+            }
         });
     });
 

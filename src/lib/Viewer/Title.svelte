@@ -4,7 +4,7 @@
 
     let { entries, currentTime }: { entries: EntryModel[], currentTime: Date } = $props();
 
-    let times = $derived.by(() => entries.flatMap(entry => entry.times));
+    let times = $derived.by(() => entries.filter(entry => !entry.independentStart).flatMap(entry => entry.times));
 </script>
 
 <div class="flex flex-row justify-between p-4 bg-gray-800 border-b-2 border-gray-700">

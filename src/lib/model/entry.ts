@@ -6,6 +6,7 @@ export class EntryModel {
     completed?: boolean = false;
     requiredRounds?: number = 1;
     completedRounds?: number = 0;
+    independentStart?: boolean = false;
 }
 
 export class EntryTimeModel {
