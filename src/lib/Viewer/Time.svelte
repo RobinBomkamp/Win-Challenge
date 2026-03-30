@@ -1,7 +1,7 @@
 <script lang="ts">
     import { EntryTimeModel } from '$lib/model/entry';
 
-    let { times, currentTime, showAsTitle = false }: { times: EntryTimeModel[], currentTime: Date, showAsTitle?: boolean } = $props();
+    let { times, currentTime, showAsTitle = false, textClass = '' }: { times: EntryTimeModel[], currentTime: Date, showAsTitle?: boolean, textClass?: string } = $props();
 
     let time = $derived.by(() => {
         let combinedTimes: { start: Date; end: Date }[] = [];
@@ -28,5 +28,5 @@
 </script>
 
 {#if time > 0}
-<p class={showAsTitle ? 'text-lg font-bold' : ''}>{String(hour).padStart(2, '0')}:{String(minute).padStart(2, '0')}:{String(second).padStart(2, '0')}</p>
+<p class={`${showAsTitle ? 'text-lg font-bold' : ''} ${textClass}`.trim()}>{String(hour).padStart(2, '0')}:{String(minute).padStart(2, '0')}:{String(second).padStart(2, '0')}</p>
 {/if}

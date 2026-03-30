@@ -11,7 +11,14 @@
 
 <div class="flex flex-row p-4 gap-4 bg-gray-700 rounded-lg shadow-lg mb-4">
     <div class="flex flex-col gap-4 flex-auto">
-        <Input label="Name" bind:value={entry.title} id="{index}-name"/>
+        <div class="flex flex-row gap-4 items-end">
+            <div class="flex-auto">
+                <Input label="Name" bind:value={entry.title} id="{index}-name"/>
+            </div>
+            <div class="w-30">
+                <Input type="number" suffix="min" bind:value={entry.estimtaedTime} id="{index}-estimated-time"/>
+            </div>
+        </div>
         <Input label="Description" bind:value={entry.description} id="{index}-description"/>
     </div>
     <div class="flex-[0_0_0] flex flex-col justify-between">

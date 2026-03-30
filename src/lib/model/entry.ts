@@ -2,6 +2,7 @@ export class EntryModel {
     title: string = '';
     description?: string = '';
     times: EntryTimeModel[] = [];
+    estimtaedTime?: number = -1;
 }
 
 export class EntryTimeModel {
