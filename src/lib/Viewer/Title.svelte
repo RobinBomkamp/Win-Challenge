@@ -40,6 +40,14 @@
         return estimatedDelta >= 0 ? '-' : '+';
     });
 
+    let totalEntries = $derived.by(() => entries.length);
+    let completedEntries = $derived.by(() => entries.filter(entry => entry.completed).length);
+    let entryProgressPercent = $derived.by(() => {
+        if (totalEntries === 0) return 0;
+        return Math.max(0, Math.min(100, (completedEntries / totalEntries) * 100));
+    });
+    let allCompleted = $derived.by(() => totalEntries > 0 && completedEntries === totalEntries);
+
     let estimatedDeltaColorClass = $derived.by(() => {
         if (estimatedDuration <= 0) {
             return '';
@@ -62,12 +70,17 @@
     }
 </script>
 
-<div class="flex flex-row justify-between p-4 bg-gray-800 border-b-2 border-gray-700">
-    <h2 class="text-lg font-bold">Win-Challenge</h2>
-    <div class="flex flex-col items-end">
-        <Time {times} {currentTime} showAsTitle={true} />
-        {#if estimatedDuration > 0}
-        <p class={`text-sm text-gray-300 ${estimatedDeltaColorClass}`.trim()}>{estimatedDeltaPrefix} {formatDuration(estimatedDelta)}</p>
-        {/if}
+<div class="relative overflow-hidden border-b-2 border-gray-700">
+    {#if !allCompleted}
+        <div class="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 via-emerald-500/80 to-emerald-500/40 transition-all duration-500 ease-out" style={`width: ${entryProgressPercent}%;`}></div>
+    {/if}
+    <div class={`relative z-10 flex flex-row justify-between p-4 transition-colors duration-300 ${allCompleted ? 'bg-emerald-500/40' : 'bg-gray-800/85'}`}>
+        <h2 class="text-lg font-bold">Win-Challenge</h2>
+        <div class="flex flex-col items-end">
+            <Time {times} {currentTime} showAsTitle={true} />
+            {#if estimatedDuration > 0}
+            <p class={`text-sm text-gray-300 ${estimatedDeltaColorClass}`.trim()}>{estimatedDeltaPrefix} {formatDuration(estimatedDelta)}</p>
+            {/if}
+        </div>
     </div>
 </div>
