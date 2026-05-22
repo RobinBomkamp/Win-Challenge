@@ -41,8 +41,8 @@
 		padding: 1rem;
 
 		overflow: hidden;
-		min-height: 100vh;
-		max-height: 100vh;
+		min-height: calc(100vh - 2rem);
+		max-height: calc(100vh - 2rem);
 
 		background: var(--md-sys-color-background);
 		color: var(--md-sys-color-on-background);
