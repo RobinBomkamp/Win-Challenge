@@ -1,12 +1,7 @@
 <script lang="ts">
-    import Button from '$lib/Button.svelte';
-    import Input from '$lib/Input.svelte';
-
     let { entry = $bindable(), onnewtimer, ondelete, oncomplete, onprogress, onprogressdown, index } = $props();
 
-    let isActive = $derived(() => {
-        return entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start';
-    });
+    let isActive = $derived(() => entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start');
 
     let requiredRounds = $derived.by(() => {
         const parsedValue = Number(entry.requiredRounds ?? 1);
@@ -19,10 +14,6 @@
             return 0;
         }
         return Math.min(requiredRounds, Math.max(0, Math.floor(parsedValue)));
-    });
-
-    let progressPercent = $derived.by(() => {
-        return Math.max(0, Math.min(100, (completedRounds / requiredRounds) * 100));
     });
 </script>
 
@@ -40,22 +31,12 @@
         </div>
         <div class="entry-config__actions">
             <div class="entry-config__action-row">
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <md-icon-button onclick={() => onprogressdown(index)}><md-icon>skip_previous</md-icon></md-icon-button>
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <md-icon-button onclick={() => onnewtimer(index)}><md-icon>{entry.completed ? 'stop' : isActive() ? 'pause' : 'play_arrow'}</md-icon></md-icon-button>
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <md-icon-button onclick={() => onprogress(index)}><md-icon>skip_next</md-icon></md-icon-button>
             </div>
             <div class="entry-config__action-row">
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <md-icon-button onclick={() => oncomplete(index)}><md-icon>check</md-icon></md-icon-button>
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <md-icon-button onclick={() => ondelete(index)}><md-icon>close</md-icon></md-icon-button>
             </div>
             <div>

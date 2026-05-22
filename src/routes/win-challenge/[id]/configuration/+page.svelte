@@ -1,8 +1,6 @@
 <script lang="ts">
-    import Button from "$lib/Button.svelte";
     import EntryConfiguration from "$lib/Configuration/EntryConfiguration.svelte";
     import type { WinChallenge } from "$lib/model/win-challenge.js";
-    import Viewer from "$lib/Viewer/Viewer.svelte";
 
     let { data } = $props();
     function normalizeEntry(entry: any) {
@@ -159,8 +157,8 @@
         <h1 class="md-typescale-display-medium">Configuration</h1>
 
         <div>
-            <Button onclick={resetTimer}>Reset</Button>
-            <Button onclick={saveConfiguration}>Save</Button>
+            <md-text-button onclick={resetTimer}>Reset</md-text-button>
+            <md-text-button onclick={saveConfiguration}>Save</md-text-button>
         </div>
     </div>
 
@@ -178,7 +176,7 @@
         {/each}
     </div>
 
-    <Button onclick={addEntry}>Add entry</Button>
+    <md-text-button onclick={addEntry}>Add entry</md-text-button>
 </div>
 
 <style lang="scss">
@@ -187,6 +185,7 @@
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        padding: 0 1rem;
 
         h1 {
             text-overflow: ellipsis;
@@ -198,7 +197,7 @@
     .container {
         display: flex;
         flex-direction: column;
-        height: inherit;
+        height: calc(100vh - 2.25rem);
         gap: 1rem;
 
         > * {

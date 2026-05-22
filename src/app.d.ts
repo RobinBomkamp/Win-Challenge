@@ -10,4 +10,18 @@ declare global {
 	}
 }
 
+// Type declarations for @material/web custom elements
+declare module 'svelte/elements' {
+	interface IntrinsicElements {
+		'md-text-button': { [attr: string]: unknown };
+		'md-icon-button': { [attr: string]: unknown };
+		'md-list': { [attr: string]: unknown };
+		'md-list-item': { [attr: string]: unknown };
+		'md-divider': { [attr: string]: unknown };
+		'md-outlined-text-field': { [attr: string]: unknown };
+		'md-icon': { [attr: string]: unknown };
+		'md-checkbox': { [attr: string]: unknown };
+	}
+}
+
 export {};

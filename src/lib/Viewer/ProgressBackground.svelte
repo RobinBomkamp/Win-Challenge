@@ -21,11 +21,11 @@
         background: linear-gradient(to right, var(--md-extended-color-success-on-color), var(--md-extended-color-success-color-container));
         transition: width background 500ms ease-out;
 
-        filter: opacity(0.5);
+        filter: opacity(0.4);
 
         &.completed {
             background: var(--md-extended-color-success-color-container);
-            filter: unset;
+            filter: brightness(0.8);
         }
     }
 </style>
