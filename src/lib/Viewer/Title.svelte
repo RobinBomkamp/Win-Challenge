@@ -10,7 +10,7 @@
 
     let estimatedDuration = $derived.by(() => entries
             .filter(entry => !entry.independentStart)
-            .reduce((sum, entry) => sum + Math.max(0, (entry.estimtaedTime ?? -1) * 60 * 1000), 0));
+            .reduce((sum, entry) => sum + Math.max(0, (entry.estimatedTime ?? -1) * 60 * 1000), 0));
 
     let currentDuration = $derived.by(() => {
         let combinedTimes: { start: Date; end: Date }[] = [];
@@ -34,7 +34,6 @@
 
     let totalEntries = $derived.by(() => entries.length);
     let completedEntries = $derived.by(() => entries.filter(entry => entry.completed).length);
-    let isCompleted = $derived.by(() => totalEntries > 0 && completedEntries === totalEntries);
 </script>
 
 <div class="title-bar">
@@ -43,7 +42,7 @@
         <h2 class="md-typescale-headline-small">Win-Challenge</h2>
         <div class="title-bar__time-info">
             <Time {times} {currentTime}/>
-            <Delta {currentDuration} {estimatedDuration} {isCompleted} />
+            <Delta {currentDuration} {estimatedDuration}/>
         </div>
     </div>
     <md-divider></md-divider>

@@ -1,32 +1,27 @@
 <script lang="ts">
-    let { entry = $bindable(), onnewtimer, ondelete, oncomplete, onprogress, onprogressdown, index } = $props();
+    import type { EntryModel } from "$lib/model/entry";
+    import type { MdOutlinedTextField } from "@material/web/all";
+
+    let { entry = $bindable(), onnewtimer, ondelete, oncomplete, onprogress, onprogressdown, index } : { entry: EntryModel, onnewtimer: Function, ondelete: Function, oncomplete: Function, onprogress: Function, onprogressdown: Function, index: number } = $props();
 
     let isActive = $derived(() => entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start');
-
-    let requiredRounds = $derived.by(() => {
-        const parsedValue = Number(entry.requiredRounds ?? 1);
-        return Number.isFinite(parsedValue) ? Math.max(1, Math.floor(parsedValue)) : 1;
-    });
-
-    let completedRounds = $derived.by(() => {
-        const parsedValue = Number(entry.completedRounds ?? 0);
-        if (!Number.isFinite(parsedValue)) {
-            return 0;
-        }
-        return Math.min(requiredRounds, Math.max(0, Math.floor(parsedValue)));
-    });
+    
+    function onchange(event: Event) {
+        const { name, value, type } = event.target as MdOutlinedTextField;
+        (entry as any)[name] = type === 'number' ? Number(value) : value;
+    }
 </script>
 
 <div class="entry-config">
     <div class="entry-config__content">
         <div class="entry-config__fields">
             <div class="entry-config__row">
-                <md-outlined-text-field label="Name" name="title" id="{index}-name" class="entry-config__field"></md-outlined-text-field>
-                <md-outlined-text-field type="number" suffix-text="min" name="estimatedTime" id="{index}-estimated-time" class="entry-config__field entry-config__field--narrow-time"></md-outlined-text-field>
+                <md-outlined-text-field label="Name" id="{index}-name" name="title" value={entry.title ?? ''} {onchange}></md-outlined-text-field>
+                <md-outlined-text-field id="{index}-estimated-time" type="number" suffix-text="min" name="estimatedTime" value={entry.estimatedTime ?? ''} {onchange}></md-outlined-text-field>
             </div>
             <div class="entry-config__row">
-                <md-outlined-text-field label="Description" name="description" id="{index}-description" class="entry-config__field"></md-outlined-text-field>
-                <md-outlined-text-field type="number" suffix-text="x" name="requiredRounds" id="{index}-required-rounds" class="entry-config__field entry-config__field--narrow-rounds"></md-outlined-text-field>
+                <md-outlined-text-field label="Description" id="{index}-description" name="description" value={entry.description ?? ''} {onchange}></md-outlined-text-field>
+                <md-outlined-text-field id="{index}-required-rounds" type="number" suffix-text="x" name="requiredRounds" value={entry.requiredRounds ?? ''} {onchange}></md-outlined-text-field>
             </div>
         </div>
         <div class="entry-config__actions">
@@ -71,11 +66,10 @@
             flex: 1 1 auto;
         }
 
-        &__field {
+        md-outlined-text-field {
             flex: 1 1 auto;
 
-            &--narrow-time,
-            &--narrow-rounds {
+            & ~ md-outlined-text-field {
                 width: 7.5rem;
             }
         }

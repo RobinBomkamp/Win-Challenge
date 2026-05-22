@@ -11,7 +11,6 @@ export async function getWinChallenges(): Promise<WinChallenge[]> {
     const querySnapshot = await getDocs(challengesCollection);
     const challenges = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WinChallenge));
     
-
     challenges.forEach(challenge => {
         if (!challenge.entries) {
             challenge.entries = [];
@@ -40,6 +39,11 @@ export async function getWinChallenges(): Promise<WinChallenge[]> {
 
             if (entry.independentStart === undefined) {
                 entry.independentStart = false;
+            }
+
+            entry.estimatedTime ??= (entry as any).estimtaedTime;
+            if ((entry as any).estimtaedTime !== undefined) {
+                delete (entry as any).estimtaedTime;
             }
         });
     });

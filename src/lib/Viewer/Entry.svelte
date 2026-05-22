@@ -25,7 +25,7 @@
         return totalDuration;
     });
 
-    let estimatedDuration = $derived.by(() => Math.max(0, (entry.estimtaedTime ?? -1) * 60 * 1000));
+    let estimatedDuration = $derived.by(() => Math.max(0, (entry.estimatedTime ?? -1) * 60 * 1000));
 
     let requiredRounds = $derived.by(() => {
         const parsedValue = Number(entry.requiredRounds ?? 1);

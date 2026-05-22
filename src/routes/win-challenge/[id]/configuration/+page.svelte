@@ -1,6 +1,5 @@
 <script lang="ts">
     import EntryConfiguration from "$lib/Configuration/EntryConfiguration.svelte";
-    import type { WinChallenge } from "$lib/model/win-challenge.js";
 
     let { data } = $props();
     function normalizeEntry(entry: any) {
@@ -26,16 +25,8 @@
         entry.independentStart = !!entry.independentStart;
     }
 
-    function initializeChallenge(source: any) {
-        const nextChallenge = structuredClone(source || { entries: [] });
-        nextChallenge.entries.forEach(normalizeEntry);
-        return nextChallenge;
-    }
-
-    let challenge: WinChallenge = $state(initializeChallenge(data.challenge));
-
     function addEntry() {
-        challenge.entries.push({
+        data.challenge.entries.push({
             title: "New Entry",
             description: "Description of new entry",
             times: [],
@@ -47,7 +38,7 @@
     }
 
     async function onnewtimer(index: number) {
-        const entry = challenge.entries[index];
+        const entry = data.challenge.entries[index];
         if (entry.completed) {
             return;
         }
@@ -63,7 +54,7 @@
 
         // Only when starting a non-independent entry, stop other running non-independent entries.
         if (!isEntryRunning && !entry.independentStart) {
-            challenge.entries.forEach((x: any, i: number) => {
+            data.challenge.entries.forEach((x: any, i: number) => {
                 if (i === index || x.times.length === 0 || x.independentStart) {
                     return;
                 }
@@ -76,7 +67,7 @@
     }
 
     async function oncomplete(index: number) {
-        const entry = challenge.entries[index];
+        const entry = data.challenge.entries[index];
         const becomesCompleted = !entry.completed;
         entry.completed = becomesCompleted;
         entry.completedRounds = becomesCompleted
@@ -96,7 +87,7 @@
     }
 
     async function onprogress(index: number) {
-        const entry = challenge.entries[index];
+        const entry = data.challenge.entries[index];
         normalizeEntry(entry);
         if (entry.completed) {
             return;
@@ -118,7 +109,7 @@
     }
 
     async function onprogressdown(index: number) {
-        const entry = challenge.entries[index];
+        const entry = data.challenge.entries[index];
         normalizeEntry(entry);
 
         entry.completedRounds = Math.max(0, (entry.completedRounds ?? 0) - 1);
@@ -128,11 +119,11 @@
     }
 
     function ondelete(index: number) {
-        challenge.entries.splice(index, 1);
+        data.challenge.entries.splice(index, 1);
     }
 
     async function resetTimer() {
-        for (const entry of challenge.entries) {
+        for (const entry of data.challenge.entries) {
             entry.times = [];
             entry.completedRounds = 0;
             entry.completed = false;
@@ -141,13 +132,13 @@
     }
 
     async function saveConfiguration() {
-        challenge.entries.forEach(normalizeEntry);
-        await fetch("/win-challenge", {
+        data.challenge.entries.forEach(normalizeEntry);
+        await fetch(`/win-challenge/${data.challenge.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(challenge),
+            body: JSON.stringify(data.challenge),
         });
     }
 </script>
@@ -163,9 +154,9 @@
     </div>
 
     <div class="entries">
-        {#each challenge.entries as entry, i}
+        {#each data.challenge.entries as entry, i}
             <EntryConfiguration
-                bind:entry={challenge.entries[i]}
+                bind:entry={data.challenge.entries[i]}
                 {onnewtimer}
                 {ondelete}
                 {oncomplete}
