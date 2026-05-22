@@ -1,18 +1,25 @@
 <script lang="ts">
-    import Button from '$lib/Button.svelte';
-    import EntryConfiguration from '$lib/Configuration/EntryConfiguration.svelte';
-    import type { WinChallenge } from '$lib/model/win-challenge.js';
-    import Viewer from '$lib/Viewer/Viewer.svelte';
+    import Button from "$lib/Button.svelte";
+    import EntryConfiguration from "$lib/Configuration/EntryConfiguration.svelte";
+    import type { WinChallenge } from "$lib/model/win-challenge.js";
+    import Viewer from "$lib/Viewer/Viewer.svelte";
 
-	let { data } = $props();
+    let { data } = $props();
     function normalizeEntry(entry: any) {
         const parsedRequiredRounds = Number(entry.requiredRounds ?? 1);
-        const safeRequiredRounds = Number.isFinite(parsedRequiredRounds) ? Math.max(1, Math.floor(parsedRequiredRounds)) : 1;
+        const safeRequiredRounds = Number.isFinite(parsedRequiredRounds)
+            ? Math.max(1, Math.floor(parsedRequiredRounds))
+            : 1;
 
         const defaultCompletedRounds = entry.completed ? safeRequiredRounds : 0;
-        const parsedCompletedRounds = Number(entry.completedRounds ?? defaultCompletedRounds);
+        const parsedCompletedRounds = Number(
+            entry.completedRounds ?? defaultCompletedRounds,
+        );
         const safeCompletedRounds = Number.isFinite(parsedCompletedRounds)
-            ? Math.min(safeRequiredRounds, Math.max(0, Math.floor(parsedCompletedRounds)))
+            ? Math.min(
+                  safeRequiredRounds,
+                  Math.max(0, Math.floor(parsedCompletedRounds)),
+              )
             : defaultCompletedRounds;
 
         entry.requiredRounds = safeRequiredRounds;
@@ -31,13 +38,13 @@
 
     function addEntry() {
         challenge.entries.push({
-            title: 'New Entry',
-            description: 'Description of new entry',
+            title: "New Entry",
+            description: "Description of new entry",
             times: [],
             completed: false,
             requiredRounds: 1,
             completedRounds: 0,
-            independentStart: false
+            independentStart: false,
         });
     }
 
@@ -46,12 +53,14 @@
         if (entry.completed) {
             return;
         }
-        const isEntryRunning = entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start';
+        const isEntryRunning =
+            entry.times.length > 0 &&
+            entry.times[entry.times.length - 1].type === "start";
 
         if (isEntryRunning) {
-            entry.times.push({ time: new Date(), type: 'end' });
+            entry.times.push({ time: new Date(), type: "end" });
         } else {
-            entry.times.push({ time: new Date(), type: 'start' });
+            entry.times.push({ time: new Date(), type: "start" });
         }
 
         // Only when starting a non-independent entry, stop other running non-independent entries.
@@ -60,8 +69,8 @@
                 if (i === index || x.times.length === 0 || x.independentStart) {
                     return;
                 }
-                if (x.times[x.times.length - 1]?.type === 'start') {
-                    x.times.push({ time: new Date(), type: 'end' });
+                if (x.times[x.times.length - 1]?.type === "start") {
+                    x.times.push({ time: new Date(), type: "end" });
                 }
             });
         }
@@ -72,11 +81,17 @@
         const entry = challenge.entries[index];
         const becomesCompleted = !entry.completed;
         entry.completed = becomesCompleted;
-        entry.completedRounds = becomesCompleted ? Math.max(1, entry.requiredRounds ?? 1) : 0;
+        entry.completedRounds = becomesCompleted
+            ? Math.max(1, entry.requiredRounds ?? 1)
+            : 0;
 
         // Auto-close a running timer when an entry gets completed.
-        if (becomesCompleted && entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start') {
-            entry.times.push({ time: new Date(), type: 'end' });
+        if (
+            becomesCompleted &&
+            entry.times.length > 0 &&
+            entry.times[entry.times.length - 1].type === "start"
+        ) {
+            entry.times.push({ time: new Date(), type: "end" });
         }
 
         await saveConfiguration();
@@ -93,8 +108,12 @@
         normalizeEntry(entry);
 
         // Auto-close a running timer when an entry reaches all rounds.
-        if (entry.completed && entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start') {
-            entry.times.push({ time: new Date(), type: 'end' });
+        if (
+            entry.completed &&
+            entry.times.length > 0 &&
+            entry.times[entry.times.length - 1].type === "start"
+        ) {
+            entry.times.push({ time: new Date(), type: "end" });
         }
 
         await saveConfiguration();
@@ -109,7 +128,7 @@
 
         await saveConfiguration();
     }
-    
+
     function ondelete(index: number) {
         challenge.entries.splice(index, 1);
     }
@@ -125,57 +144,71 @@
 
     async function saveConfiguration() {
         challenge.entries.forEach(normalizeEntry);
-        await fetch('/win-challenge', {
-            method: 'POST',
+        await fetch("/win-challenge", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify(challenge)
+            body: JSON.stringify(challenge),
         });
-    }   
+    }
 </script>
 
-<h1 class="md-typescale-display-medium">Configuration {challenge.id}</h1>
+<div class="container">
+    <div class="header">
+        <h1 class="md-typescale-display-medium">Configuration</h1>
 
-<div class="configuration__header-right">
-    <Button onclick={resetTimer}>Reset</Button>
-    <Button onclick={saveConfiguration}>Save</Button>
-</div>
+        <div>
+            <Button onclick={resetTimer}>Reset</Button>
+            <Button onclick={saveConfiguration}>Save</Button>
+        </div>
+    </div>
 
-<div class="configuration__layout">
-    <div class="configuration__entries">
+    <div class="entries">
         {#each challenge.entries as entry, i}
-            <EntryConfiguration bind:entry={challenge.entries[i]} {onnewtimer} {ondelete} {oncomplete} {onprogress} {onprogressdown} index={i} />
+            <EntryConfiguration
+                bind:entry={challenge.entries[i]}
+                {onnewtimer}
+                {ondelete}
+                {oncomplete}
+                {onprogress}
+                {onprogressdown}
+                index={i}
+            />
         {/each}
-        <Button onclick={addEntry}>Add entry</Button>
     </div>
-    <div class="configuration__viewer">
-        <Viewer entries={challenge.entries} />
-    </div>
+
+    <Button onclick={addEntry}>Add entry</Button>
 </div>
 
 <style lang="scss">
-    .configuration {
-        &__header-left {
-            float: left;
+    .header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        h1 {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        height: inherit;
+        gap: 1rem;
+
+        > * {
+            flex: 1 1 auto;
         }
 
-        &__header-right {
-            float: right;
-        }
-
-        &__layout {
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            gap: 1rem;
-            margin-top: 3.5rem;
-            height: calc(100vh - 6rem);
+        .entries {
             overflow: auto;
-        }
-
-        &__entries {
-            flex: 1;
+            scrollbar-gutter: stable;
+            padding-right: 1rem;
         }
     }
 </style>
