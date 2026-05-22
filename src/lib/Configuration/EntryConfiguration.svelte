@@ -24,47 +24,96 @@
     let progressPercent = $derived.by(() => {
         return Math.max(0, Math.min(100, (completedRounds / requiredRounds) * 100));
     });
-
-    let cardStyle = $derived.by(() => {
-        return `background: linear-gradient(90deg, rgba(74, 222, 128, 0.24) 0%, rgba(74, 222, 128, 0.24) ${progressPercent}%, rgba(55, 65, 81, 1) ${progressPercent}%, rgba(55, 65, 81, 1) 100%);`;
-    });
 </script>
 
-<div class="relative rounded-lg shadow-lg mb-4 bg-gray-700 overflow-hidden">
-    <div class="absolute inset-y-0 left-0 bg-green-400/25 transition-all duration-500 ease-out" style={`width: ${progressPercent}%;`}></div>
-    <div class="relative z-10 flex flex-row p-4 gap-4">
-        <div class="flex flex-col gap-4 flex-auto">
-            <div class="flex flex-row gap-4 items-end">
-                <div class="flex-auto">
-                    <Input label="Name" bind:value={entry.title} id="{index}-name"/>
-                </div>
-                <div class="w-30">
-                    <Input type="number" suffix="min" bind:value={entry.estimtaedTime} id="{index}-estimated-time"/>
-                </div>
+<div class="entry-config">
+    <div class="entry-config__content">
+        <div class="entry-config__fields">
+            <div class="entry-config__row">
+                <md-outlined-text-field label="Name" name="title" id="{index}-name" class="entry-config__field"></md-outlined-text-field>
+                <md-outlined-text-field type="number" suffix-text="min" name="estimatedTime" id="{index}-estimated-time" class="entry-config__field entry-config__field--narrow-time"></md-outlined-text-field>
             </div>
-            <div class="flex flex-row gap-4 items-end">
-                <div class="flex-auto">
-                    <Input label="Description" bind:value={entry.description} id="{index}-description"/>
-                </div>
-                <div class="w-20">
-                    <Input type="number" suffix="x" bind:value={entry.requiredRounds} id="{index}-required-rounds"/>
-                </div>
+            <div class="entry-config__row">
+                <md-outlined-text-field label="Description" name="description" id="{index}-description" class="entry-config__field"></md-outlined-text-field>
+                <md-outlined-text-field type="number" suffix-text="x" name="requiredRounds" id="{index}-required-rounds" class="entry-config__field entry-config__field--narrow-rounds"></md-outlined-text-field>
             </div>
         </div>
-        <div class="flex-[0_0_0] flex flex-col gap-2 w-full">
-            <div class="flex flex-row gap-1 w-full">
-                <Button compact={true} onclick={() => onprogressdown(index)}>⏮</Button>
-                <Button compact={true} onclick={() => onnewtimer(index)}>{entry.completed ? '‐' : isActive() ? '⏸' : '▶'}</Button>
-                <Button compact={true} onclick={() => onprogress(index)}>⏭</Button>
+        <div class="entry-config__actions">
+            <div class="entry-config__action-row">
+                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                <md-icon-button onclick={() => onprogressdown(index)}><md-icon>skip_previous</md-icon></md-icon-button>
+                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                <md-icon-button onclick={() => onnewtimer(index)}><md-icon>{entry.completed ? 'stop' : isActive() ? 'pause' : 'play_arrow'}</md-icon></md-icon-button>
+                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                <md-icon-button onclick={() => onprogress(index)}><md-icon>skip_next</md-icon></md-icon-button>
             </div>
-            <div class="flex flex-row gap-1 w-full">
-                <Button compact={true} onclick={() => oncomplete(index)}>✓</Button>
-                <Button compact={true} onclick={() => ondelete(index)}>✕</Button>
+            <div class="entry-config__action-row">
+                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                <md-icon-button onclick={() => oncomplete(index)}><md-icon>check</md-icon></md-icon-button>
+                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                <md-icon-button onclick={() => ondelete(index)}><md-icon>close</md-icon></md-icon-button>
             </div>
-            <label class="inline-flex items-center gap-2 text-sm text-gray-200">
-                <input type="checkbox" bind:checked={entry.independentStart} class="rounded border-gray-500 bg-gray-800" />
-                Independent
-            </label>
+            <div>
+                <md-checkbox id="independent-start-{index}" name="independentStart" touch-target="wrapper"></md-checkbox>
+                <label for="independent-start-{index}">Independent</label>
+            </div>
         </div>
     </div>
 </div>
+
+<style lang="scss">
+    .entry-config {
+        border-radius: 1rem;
+        background-color: var(--md-sys-color-surface-container-low);
+        overflow: hidden;
+        margin-bottom: 1rem;
+
+        &__content,
+        &__fields,
+        &__row {
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+        }
+
+        &__content {
+            padding: 1rem;
+        }
+
+        &__fields {
+            flex-direction: column;
+            flex: 1 1 auto;
+        }
+
+        &__field {
+            flex: 1 1 auto;
+
+            &--narrow-time,
+            &--narrow-rounds {
+                width: 7.5rem;
+            }
+        }
+
+        &__actions {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        &__action-row {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+        }
+
+        label {
+            display: inline-block;
+            margin-top: 0.75rem;
+        }
+    }
+</style>

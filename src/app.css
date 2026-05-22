@@ -1,3 +1,17 @@
-@import 'tailwindcss';
-@plugin '@tailwindcss/forms';
-@plugin '@tailwindcss/typography';
+:root {
+    /* Body/UI */
+    --md-ref-typeface-plain: "Inter Variable", sans-serif;
+
+    /* Headlines */
+    --md-ref-typeface-brand: "Inter Tight Variable", sans-serif;
+}
+
+html,
+body {
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6,
+p, span, a, div {
+    margin: 0;
+}

@@ -2,16 +2,73 @@
     let { value = $bindable(), label = '', id, type = "text", suffix = '' } = $props();
 </script>
 
-<div class="flex flex-row margin-bottom-4 items-center gap-2">
+<div class="input-field">
     {#if label}
-    <label for="{id}-input" class="flex-0 basis-3xs font-bold mb-2 mt-2">{label}</label>
+    <label for="{id}-input" class="input-field__label">{label}</label>
     {/if}
-    <div class="flex flex-auto">
-        <div class="relative flex-auto">
-            <input id="{id}-input" {type} bind:value={value} class={`flex-auto w-full rounded-lg bg-gray-800 ${(suffix || type === 'number') ? 'text-right' : ''} ${suffix ? 'pr-10' : ''}`}/>
+    <div class="input-field__wrapper">
+        <div class="input-field__inner">
+            <input
+                id="{id}-input"
+                {type}
+                bind:value={value}
+                class={`input-field__input${(suffix || type === 'number') ? ' input-field__input--right' : ''}${suffix ? ' input-field__input--with-suffix' : ''}`}
+            />
             {#if suffix}
-            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-300 whitespace-nowrap">{suffix}</span>
+            <span class="input-field__suffix">{suffix}</span>
             {/if}
         </div>
     </div>
 </div>
+
+<style lang="scss">
+    .input-field {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+
+        &__label {
+            flex: 0 0 auto;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        &__wrapper {
+            display: flex;
+            flex: 1 1 auto;
+        }
+
+        &__inner {
+            position: relative;
+            flex: 1 1 auto;
+        }
+
+        &__input {
+            width: 100%;
+            border-radius: 0.5rem;
+            background-color: #1f2937;
+
+            &--right {
+                text-align: right;
+            }
+
+            &--with-suffix {
+                padding-right: 2.5rem;
+            }
+        }
+
+        &__suffix {
+            pointer-events: none;
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            color: #d1d5db;
+            white-space: nowrap;
+        }
+    }
+</style>

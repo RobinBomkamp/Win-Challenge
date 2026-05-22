@@ -1,7 +1,7 @@
 <script lang="ts">
     import Button from '$lib/Button.svelte';
     import EntryConfiguration from '$lib/Configuration/EntryConfiguration.svelte';
-	import Headline from '$lib/Headline.svelte';
+    import type { WinChallenge } from '$lib/model/win-challenge.js';
     import Viewer from '$lib/Viewer/Viewer.svelte';
 
 	let { data } = $props();
@@ -27,7 +27,7 @@
         return nextChallenge;
     }
 
-    let challenge = $state(initializeChallenge(data.challenge));
+    let challenge: WinChallenge = $state(initializeChallenge(data.challenge));
 
     function addEntry() {
         challenge.entries.push({
@@ -132,25 +132,50 @@
             },
             body: JSON.stringify(challenge)
         });
-    }
+    }   
 </script>
 
-<div class="float-left">
-    <Headline title="Configuration" />
-</div>
-<div class="float-right">
+<h1 class="md-typescale-display-medium">Configuration {challenge.id}</h1>
+
+<div class="configuration__header-right">
     <Button onclick={resetTimer}>Reset</Button>
     <Button onclick={saveConfiguration}>Save</Button>
 </div>
 
-<div id="layout" class="flex flex-row w-full gap-4 mt-14 h-[calc(100vh-6rem)] overflow-auto">
-    <div id="configuration-content" class="flex-1">
+<div class="configuration__layout">
+    <div class="configuration__entries">
         {#each challenge.entries as entry, i}
             <EntryConfiguration bind:entry={challenge.entries[i]} {onnewtimer} {ondelete} {oncomplete} {onprogress} {onprogressdown} index={i} />
         {/each}
         <Button onclick={addEntry}>Add entry</Button>
     </div>
-    <div id="viewer-content" class="flex-0">
+    <div class="configuration__viewer">
         <Viewer entries={challenge.entries} />
     </div>
 </div>
+
+<style lang="scss">
+    .configuration {
+        &__header-left {
+            float: left;
+        }
+
+        &__header-right {
+            float: right;
+        }
+
+        &__layout {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            gap: 1rem;
+            margin-top: 3.5rem;
+            height: calc(100vh - 6rem);
+            overflow: auto;
+        }
+
+        &__entries {
+            flex: 1;
+        }
+    }
+</style>

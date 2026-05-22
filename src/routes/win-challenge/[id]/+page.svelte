@@ -2,8 +2,9 @@
     import Viewer from '$lib/Viewer/Viewer.svelte';
     import { onMount } from 'svelte';
     import { invalidateAll } from '$app/navigation';
+    import type { PageData } from './$types';
 
-    let { data } = $props();
+    let { data }: { data: PageData} = $props();
 
     onMount(() => {
 		const interval = setInterval(() => {

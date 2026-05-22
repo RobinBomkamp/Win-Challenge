@@ -3,8 +3,35 @@
 </script>
 
 <button
-    class={`bg-gray-700 hover:bg-gray-600 active:bg-gray-500 text-white font-semibold rounded shadow-2xs shadow-gray-700 ${compact ? 'py-1 px-2 text-sm' : 'py-2 px-4'}`}
+    class={`button${compact ? ' button--compact' : ''}`}
     {onclick}
 >
     {@render children()}
 </button>
+
+<style lang="scss">
+    .button {
+        background-color: #374151;
+        color: #ffffff;
+        font-weight: 600;
+        border-radius: 0.25rem;
+        box-shadow: 0 1px 2px rgba(55, 65, 81, 0.5);
+        padding: 0.5rem 1rem;
+        border: none;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #4b5563;
+        }
+
+        &:active {
+            background-color: #6b7280;
+        }
+
+        &--compact {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+    }
+</style>

@@ -1,11 +1,9 @@
 <script lang="ts">
     import Time from "./Time.svelte";
+    import Delta from "./Delta.svelte";
+    import ProgressBackground from "./ProgressBackground.svelte";
 
     let { entry, currentTime } = $props();
-
-    let isRunning = $derived.by(() => {
-        return entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start';
-    });
 
     let currentDuration = $derived.by(() => {
         let combinedTimes: { start: Date; end: Date }[] = [];
@@ -27,9 +25,7 @@
         return totalDuration;
     });
 
-    let estimatedDuration = $derived.by(() => {
-        return Math.max(0, (entry.estimtaedTime ?? -1) * 60 * 1000);
-    });
+    let estimatedDuration = $derived.by(() => Math.max(0, (entry.estimtaedTime ?? -1) * 60 * 1000));
 
     let requiredRounds = $derived.by(() => {
         const parsedValue = Number(entry.requiredRounds ?? 1);
@@ -43,78 +39,69 @@
         }
         return Math.min(requiredRounds, Math.max(0, Math.floor(parsedValue)));
     });
-
-    let progressPercent = $derived.by(() => {
-        return Math.max(0, Math.min(100, (completedRounds / requiredRounds) * 100));
-    });
-
-    let viewerCardClass = $derived.by(() => {
-        const hasTime = currentDuration > 0 || entry.times.length > 0;
-        
-        if (!hasTime) {
-            return 'bg-gray-800/85';
-        }
-        
-        if (entry.completed) {
-            return 'bg-emerald-500/40 border-l-4 border-emerald-400';
-        }
-        
-        return 'bg-gray-800/85 border-l-4 border-emerald-600/70';
-    });
-
-    let runningTimeColorClass = $derived.by(() => {
-        if (estimatedDuration <= 0) {
-            return '';
-        }
-        if (currentDuration > estimatedDuration) {
-            return 'text-red-400';
-        }
-        if (isRunning && currentDuration < estimatedDuration) {
-            return 'text-green-400';
-        }
-        return '';
-    });
-
-    let estimatedDelta = $derived.by(() => {
-        return estimatedDuration - currentDuration;
-    });
-
-    let estimatedDeltaPrefix = $derived.by(() => {
-        return estimatedDelta >= 0 ? '-' : '+';
-    });
-
-    function formatDuration(durationInMs: number): string {
-        const safeDuration = Math.max(0, Math.abs(durationInMs));
-        const hour = Math.floor(safeDuration / 3600 / 1000);
-        const minute = Math.floor((safeDuration % (3600 * 1000)) / 60000);
-        const second = Math.floor((safeDuration % 60000) / 1000);
-        return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
-    }
+    
 </script>
 
-<div class="relative overflow-hidden">
-    {#if !entry.completed}
-        <div class="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 via-emerald-500/80 to-emerald-500/40 transition-all duration-500 ease-out" style={`width: ${progressPercent}%;`}></div>
-    {/if}
-    <div class={`relative z-10 flex flex-row justify-between p-4 transition-colors duration-300 ${viewerCardClass}`}>
-        <div class="flex flex-row gap-3">
-            {#if entry.completed}
-            <div class="pt-0.5 text-green-300 font-bold">✓</div>
-            {:else}
-            <div class="pt-0.5 text-gray-500 font-bold">•</div>
+<div class="entry-card">
+    <ProgressBackground current={completedRounds} total={requiredRounds} />
+    <div class="entry-card__content" class:entry-card__content--active={(currentDuration > 0 || entry.times.length > 0) && !entry.completed}>
+        {#if entry.completed}
+        <div class="entry-card__status entry-card__status--completed">✓</div>
+        {:else}
+        <div class="entry-card__status">•</div>
+        {/if}
+        <div class="entry-card__info">
+            <p>{entry.title}</p>
+            {#if entry.description !== ""}
+            <p class="md-typescale-body-medium entry-card__description">{entry.description}</p>
             {/if}
-            <div>
-                <p>{entry.title}</p>
-                {#if entry.description !== ""}
-                <p class="text-sm text-gray-400">{entry.description}</p>
-                {/if}
-            </div>
         </div>
-        <div class="flex flex-col items-end">
+        <div class="entry-card__time-info">
             <Time times={entry.times} {currentTime} />
-            {#if estimatedDuration > 0}
-            <p class="text-sm text-gray-300 {runningTimeColorClass}">{estimatedDeltaPrefix} {formatDuration(estimatedDelta)}</p>
-            {/if}
+            <Delta {currentDuration} {estimatedDuration} />
         </div>
     </div>
 </div>
+
+<style lang="scss">
+    .entry-card {
+        position: relative;
+        overflow: hidden;
+
+        &__content {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            padding: 1rem;
+            gap: 1rem;
+
+            &--active {
+                border-left: 0.25rem solid var(--md-extended-color-success-on-color);
+            }
+        }
+
+        &__status {
+            font-weight: bold;
+            color: var(--md-sys-color-outline);
+
+            &--completed {
+                color: var(--md-extended-color-success-color);
+            }
+        }
+
+        &__info {
+            flex: 1 1 auto;
+        }
+
+        &__description {
+            color: var(--md-sys-color-outline);
+        }
+
+        &__time-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+    }
+</style>
