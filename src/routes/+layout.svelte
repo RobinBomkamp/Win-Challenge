@@ -70,9 +70,6 @@
 		overflow: hidden;
 		min-height: calc(100vh - 2rem);
 		max-height: calc(100vh - 2rem);
-
-		background: var(--md-sys-color-background);
-		color: var(--md-sys-color-on-background);
 	}
 
 	.menu-button {
