@@ -259,6 +259,7 @@
 
     .create-button {
         display: inline-flex;
+        display: none;
         align-items: center;
         gap: 0.75rem;
         padding: 1.25rem 2.5rem;
