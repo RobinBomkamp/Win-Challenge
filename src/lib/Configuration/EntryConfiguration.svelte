@@ -23,12 +23,12 @@
     <div class="entry-config__content">
         <div class="entry-config__fields">
             <div class="entry-config__row">
-                <md-outlined-text-field label="Name" value={internalEntry.title} onchange={(event: Event) => onchange(event, 'title')}></md-outlined-text-field>
-                <md-outlined-text-field type="number" suffix-text="min" value={internalEntry.estimatedTime} onchange={(event: Event) => onchange(event, 'estimatedTime')}></md-outlined-text-field>
+                <md-outlined-text-field label="Name" value={internalEntry.title ?? ''} onchange={(event: Event) => onchange(event, 'title')}></md-outlined-text-field>
+                <md-outlined-text-field type="number" suffix-text="min" value={internalEntry.estimatedTime ?? 0} onchange={(event: Event) => onchange(event, 'estimatedTime')}></md-outlined-text-field>
             </div>
             <div class="entry-config__row">
-                <md-outlined-text-field label="Description" value={internalEntry.description} onchange={(event: Event) => onchange(event, 'description')}></md-outlined-text-field>
-                <md-outlined-text-field type="number" suffix-text="x" value={internalEntry.requiredRounds} onchange={(event: Event) => onchange(event, 'requiredRounds')}></md-outlined-text-field>
+                <md-outlined-text-field label="Description" value={internalEntry.description ?? ''} onchange={(event: Event) => onchange(event, 'description')}></md-outlined-text-field>
+                <md-outlined-text-field type="number" suffix-text="x" value={internalEntry.requiredRounds ?? 0} onchange={(event: Event) => onchange(event, 'requiredRounds')}></md-outlined-text-field>
             </div>
         </div>
         <div class="entry-config__actions">
