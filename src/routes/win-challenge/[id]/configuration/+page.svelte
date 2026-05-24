@@ -1,7 +1,14 @@
 <script lang="ts">
+    import { goto, invalidateAll } from "$app/navigation";
     import EntryConfiguration from "$lib/Configuration/EntryConfiguration.svelte";
 
     let { data } = $props();
+
+    let challenge = $state(data.challenge);
+    $effect(() => {
+        challenge = data.challenge;
+    });
+
     function normalizeEntry(entry: any) {
         const parsedRequiredRounds = Number(entry.requiredRounds ?? 1);
         const safeRequiredRounds = Number.isFinite(parsedRequiredRounds)
@@ -26,7 +33,7 @@
     }
 
     function addEntry() {
-        data.challenge.entries.push({
+        challenge.entries.push({
             title: "New Entry",
             description: "Description of new entry",
             times: [],
@@ -38,7 +45,7 @@
     }
 
     async function onnewtimer(index: number) {
-        const entry = data.challenge.entries[index];
+        const entry = challenge.entries[index];
         if (entry.completed) {
             return;
         }
@@ -54,7 +61,7 @@
 
         // Only when starting a non-independent entry, stop other running non-independent entries.
         if (!isEntryRunning && !entry.independentStart) {
-            data.challenge.entries.forEach((x: any, i: number) => {
+            challenge.entries.forEach((x: any, i: number) => {
                 if (i === index || x.times.length === 0 || x.independentStart) {
                     return;
                 }
@@ -67,7 +74,7 @@
     }
 
     async function oncomplete(index: number) {
-        const entry = data.challenge.entries[index];
+        const entry = challenge.entries[index];
         const becomesCompleted = !entry.completed;
         entry.completed = becomesCompleted;
         entry.completedRounds = becomesCompleted
@@ -87,7 +94,7 @@
     }
 
     async function onprogress(index: number) {
-        const entry = data.challenge.entries[index];
+        const entry = challenge.entries[index];
         normalizeEntry(entry);
         if (entry.completed) {
             return;
@@ -109,7 +116,7 @@
     }
 
     async function onprogressdown(index: number) {
-        const entry = data.challenge.entries[index];
+        const entry = challenge.entries[index];
         normalizeEntry(entry);
 
         entry.completedRounds = Math.max(0, (entry.completedRounds ?? 0) - 1);
@@ -119,11 +126,11 @@
     }
 
     function ondelete(index: number) {
-        data.challenge.entries.splice(index, 1);
+        challenge.entries.splice(index, 1);
     }
 
     async function resetTimer() {
-        for (const entry of data.challenge.entries) {
+        for (const entry of challenge.entries) {
             entry.times = [];
             entry.completedRounds = 0;
             entry.completed = false;
@@ -131,32 +138,59 @@
         await saveConfiguration();
     }
 
+    async function deleteChallenge() {
+        if (!confirm(`Are you sure you want to delete "${challenge.name}"? This action cannot be undone.`)) {
+            return;
+        }
+
+        const response = await fetch(`/win-challenge/${challenge.id}`, {
+            method: "DELETE",
+        });
+
+        if (!response.ok) {
+            alert("Failed to delete challenge.");
+        } else {
+            goto("/");
+            invalidateAll();
+        }
+    }
+
     async function saveConfiguration() {
-        data.challenge.entries.forEach(normalizeEntry);
-        await fetch(`/win-challenge/${data.challenge.id}`, {
+        challenge.entries.forEach(normalizeEntry);
+        const response = await fetch(`/win-challenge/${challenge.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(data.challenge),
+            body: JSON.stringify(challenge),
         });
+
+        if (!response.ok) {
+            alert("Failed to save challenge configuration.");
+        } else {
+            const result = await response.json();
+            challenge.id = result.id;
+        }
+        goto(`/win-challenge/${challenge.id}/configuration`);
+        invalidateAll();
     }
 </script>
 
 <div class="container">
     <div class="header">
-        <h1 class="md-typescale-display-medium">Configuration</h1>
+        <md-outlined-text-field label="Challenge name" value={challenge.name ?? ''} onchange={(event: Event) => (challenge.name = (event.target as HTMLInputElement).value)}></md-outlined-text-field>
 
         <div>
+            <md-text-button onclick={deleteChallenge}>Delete</md-text-button>
             <md-text-button onclick={resetTimer}>Reset</md-text-button>
             <md-text-button onclick={saveConfiguration}>Save</md-text-button>
         </div>
     </div>
 
     <div class="entries">
-        {#each data.challenge.entries as entry, i}
+        {#each challenge.entries as entry, i}
             <EntryConfiguration
-                bind:entry={data.challenge.entries[i]}
+                bind:entry={challenge.entries[i]}
                 {onnewtimer}
                 {ondelete}
                 {oncomplete}
@@ -177,6 +211,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 0 1rem;
+        margin-top: 1rem;
 
         h1 {
             text-overflow: ellipsis;
@@ -185,13 +220,17 @@
         }
     }
 
+    md-outlined-text-field {
+        width: 16rem;
+    }
+
     .container {
         display: flex;
         flex-direction: column;
         height: calc(100vh - 2.25rem);
         gap: 1rem;
 
-        > * {
+        .entries {
             flex: 1 1 auto;
         }
 

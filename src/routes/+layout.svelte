@@ -15,10 +15,10 @@
 
 <main class="md-typescale-body-large dark">
 	<nav>
-		<h1 class="md-typescale-headline-medium">Win-Challenges</h1>
+		<a class="md-typescale-headline-medium" href="/">Win-Challenges</a>
 		<md-list>
 			{#each data.challenges as challenge}
-				<md-list-item type="link" href={`/win-challenge/${challenge.id}`}>{challenge.id}</md-list-item>
+				<md-list-item type="link" href={`/win-challenge/${challenge.id}`}>{challenge.name ?? challenge.id}</md-list-item>
 			{/each}
 		</md-list>
 	</nav>
@@ -29,6 +29,11 @@
 </main>
 
 <style lang="scss">
+
+	a {
+		text-decoration: none;
+		color: inherit;
+	}
 
 	md-list-item {
 		border-radius: 9999px;
