@@ -212,12 +212,6 @@
         align-items: center;
         padding: 0 1rem;
         margin-top: 1rem;
-
-        h1 {
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-        }
     }
 
     md-outlined-text-field {

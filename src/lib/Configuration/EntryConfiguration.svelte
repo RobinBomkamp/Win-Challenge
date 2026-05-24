@@ -66,6 +66,7 @@
         background-color: var(--md-sys-color-surface-container-low);
         overflow: hidden;
         margin-bottom: 1rem;
+        width: min(100%, 30rem);
 
         &__content,
         &__fields,

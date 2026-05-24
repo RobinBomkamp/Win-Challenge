@@ -55,8 +55,6 @@
 
 	.content {
 		padding: 0 1rem;
-
-		max-width: 1200px;
 		margin: 0 auto;
 
 		height: calc(100vh - 2rem);
