@@ -1,7 +1,6 @@
-import { collection, getDocs, getFirestore, setDoc, doc } from "firebase/firestore";
+import { collection, getDocs, getFirestore, setDoc, doc, addDoc, deleteDoc } from "firebase/firestore";
 import { getFirebaseApp } from "./firebase";
 import type { WinChallenge } from "$lib/model/win-challenge";
-import { addDoc } from "firebase/firestore/lite";
 
 export async function getWinChallenges(): Promise<WinChallenge[]> {
     const app = getFirebaseApp();
@@ -11,7 +10,6 @@ export async function getWinChallenges(): Promise<WinChallenge[]> {
     const querySnapshot = await getDocs(challengesCollection);
     const challenges = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WinChallenge));
     
-
     challenges.forEach(challenge => {
         if (!challenge.entries) {
             challenge.entries = [];
@@ -41,6 +39,11 @@ export async function getWinChallenges(): Promise<WinChallenge[]> {
             if (entry.independentStart === undefined) {
                 entry.independentStart = false;
             }
+
+            entry.estimatedTime ??= (entry as any).estimtaedTime;
+            if ((entry as any).estimtaedTime !== undefined) {
+                delete (entry as any).estimtaedTime;
+            }
         });
     });
 
@@ -52,7 +55,7 @@ export async function setWinChallenge(challenge: WinChallenge): Promise<string> 
     const firestore = getFirestore(app);
     const challengesCollection = collection(firestore, 'win-challenge');
 
-    if (!challenge.id) {
+    if (!challenge.id || challenge.id === 'new') {
         const docRef = await addDoc(challengesCollection, challenge);
         challenge.id = docRef.id;
     } else {
@@ -60,4 +63,10 @@ export async function setWinChallenge(challenge: WinChallenge): Promise<string> 
     }
 
     return challenge.id;
+}
+
+export async function deleteWinChallenge(challengeId: string): Promise<void> {
+    const app = getFirebaseApp();
+    const firestore = getFirestore(app);
+    await deleteDoc(doc(firestore, "win-challenge", challengeId));
 }

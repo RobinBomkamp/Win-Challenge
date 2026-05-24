@@ -1,70 +1,104 @@
 <script lang="ts">
-    import Button from '$lib/Button.svelte';
-    import Input from '$lib/Input.svelte';
+    import type { EntryModel } from "$lib/model/entry";
+    import { MdCheckbox, MdOutlinedTextField } from "@material/web/all";
 
-    let { entry = $bindable(), onnewtimer, ondelete, oncomplete, onprogress, onprogressdown, index } = $props();
-
-    let isActive = $derived(() => {
-        return entry.times.length > 0 && entry.times[entry.times.length - 1].type === 'start';
+    let { entry = $bindable(), onnewtimer, ondelete, oncomplete, onprogress, onprogressdown, index } : { entry: EntryModel, onnewtimer: Function, ondelete: Function, oncomplete: Function, onprogress: Function, onprogressdown: Function, index: number } = $props();
+    
+    let internalEntry = $state(entry);
+    $effect(() => {
+        internalEntry = entry;
     });
 
-    let requiredRounds = $derived.by(() => {
-        const parsedValue = Number(entry.requiredRounds ?? 1);
-        return Number.isFinite(parsedValue) ? Math.max(1, Math.floor(parsedValue)) : 1;
-    });
+    let isActive = $derived(() => internalEntry.times.length > 0 && internalEntry.times[internalEntry.times.length - 1].type === 'start');
 
-    let completedRounds = $derived.by(() => {
-        const parsedValue = Number(entry.completedRounds ?? 0);
-        if (!Number.isFinite(parsedValue)) {
-            return 0;
-        }
-        return Math.min(requiredRounds, Math.max(0, Math.floor(parsedValue)));
-    });
-
-    let progressPercent = $derived.by(() => {
-        return Math.max(0, Math.min(100, (completedRounds / requiredRounds) * 100));
-    });
-
-    let cardStyle = $derived.by(() => {
-        return `background: linear-gradient(90deg, rgba(74, 222, 128, 0.24) 0%, rgba(74, 222, 128, 0.24) ${progressPercent}%, rgba(55, 65, 81, 1) ${progressPercent}%, rgba(55, 65, 81, 1) 100%);`;
-    });
+    function onchange(event: Event, field: keyof EntryModel = 'title') {
+        const target = event.target as HTMLInputElement;
+        (internalEntry[field] as any) = typeof internalEntry[field] === 'number' ? Number(target.value) : target.value;
+        entry = internalEntry;
+    }
+    
 </script>
 
-<div class="relative rounded-lg shadow-lg mb-4 bg-gray-700 overflow-hidden">
-    <div class="absolute inset-y-0 left-0 bg-green-400/25 transition-all duration-500 ease-out" style={`width: ${progressPercent}%;`}></div>
-    <div class="relative z-10 flex flex-row p-4 gap-4">
-        <div class="flex flex-col gap-4 flex-auto">
-            <div class="flex flex-row gap-4 items-end">
-                <div class="flex-auto">
-                    <Input label="Name" bind:value={entry.title} id="{index}-name"/>
-                </div>
-                <div class="w-30">
-                    <Input type="number" suffix="min" bind:value={entry.estimtaedTime} id="{index}-estimated-time"/>
-                </div>
+<div class="entry-config">
+    <div class="entry-config__content">
+        <div class="entry-config__fields">
+            <div class="entry-config__row">
+                <md-outlined-text-field label="Name" value={internalEntry.title} onchange={(event: Event) => onchange(event, 'title')}></md-outlined-text-field>
+                <md-outlined-text-field type="number" suffix-text="min" value={internalEntry.estimatedTime} onchange={(event: Event) => onchange(event, 'estimatedTime')}></md-outlined-text-field>
             </div>
-            <div class="flex flex-row gap-4 items-end">
-                <div class="flex-auto">
-                    <Input label="Description" bind:value={entry.description} id="{index}-description"/>
-                </div>
-                <div class="w-20">
-                    <Input type="number" suffix="x" bind:value={entry.requiredRounds} id="{index}-required-rounds"/>
-                </div>
+            <div class="entry-config__row">
+                <md-outlined-text-field label="Description" value={internalEntry.description} onchange={(event: Event) => onchange(event, 'description')}></md-outlined-text-field>
+                <md-outlined-text-field type="number" suffix-text="x" value={internalEntry.requiredRounds} onchange={(event: Event) => onchange(event, 'requiredRounds')}></md-outlined-text-field>
             </div>
         </div>
-        <div class="flex-[0_0_0] flex flex-col gap-2 w-full">
-            <div class="flex flex-row gap-1 w-full">
-                <Button compact={true} onclick={() => onprogressdown(index)}>⏮</Button>
-                <Button compact={true} onclick={() => onnewtimer(index)}>{entry.completed ? '‐' : isActive() ? '⏸' : '▶'}</Button>
-                <Button compact={true} onclick={() => onprogress(index)}>⏭</Button>
+        <div class="entry-config__actions">
+            <div class="entry-config__action-row">
+                <md-icon-button onclick={() => onprogressdown(index)}><md-icon>skip_previous</md-icon></md-icon-button>
+                <md-icon-button onclick={() => onnewtimer(index)}><md-icon>{internalEntry.completed ? 'stop' : isActive() ? 'pause' : 'play_arrow'}</md-icon></md-icon-button>
+                <md-icon-button onclick={() => onprogress(index)}><md-icon>skip_next</md-icon></md-icon-button>
             </div>
-            <div class="flex flex-row gap-1 w-full">
-                <Button compact={true} onclick={() => oncomplete(index)}>✓</Button>
-                <Button compact={true} onclick={() => ondelete(index)}>✕</Button>
+            <div class="entry-config__action-row">
+                <md-icon-button onclick={() => oncomplete(index)}><md-icon>check</md-icon></md-icon-button>
+                <md-icon-button onclick={() => ondelete(index)}><md-icon>close</md-icon></md-icon-button>
             </div>
-            <label class="inline-flex items-center gap-2 text-sm text-gray-200">
-                <input type="checkbox" bind:checked={entry.independentStart} class="rounded border-gray-500 bg-gray-800" />
-                Independent
-            </label>
+            <div>
+                <!-- svelte-ignore a11y_label_has_associated_control -->
+                <label>
+                    <md-checkbox touch-target="wrapper" checked={internalEntry.independentStart} onchange={({target}: {target: MdCheckbox}) => (internalEntry.independentStart = target.checked)}></md-checkbox>
+                    <span>Independent</span>
+                </label>
+            </div>
         </div>
     </div>
 </div>
+
+<style lang="scss">
+    :global(.entry-config md-outlined-text-field) {
+        flex: 1 1 auto;
+    }
+
+    :global(.entry-config md-outlined-text-field ~ md-outlined-text-field) {
+        width: 7.5rem;
+    }
+
+    .entry-config {
+        border-radius: 1rem;
+        background-color: var(--md-sys-color-surface-container-low);
+        overflow: hidden;
+        margin-bottom: 1rem;
+
+        &__content,
+        &__fields,
+        &__row {
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+        }
+
+        &__content {
+            padding: 1rem;
+        }
+
+        &__fields {
+            flex-direction: column;
+            flex: 1 1 auto;
+        }
+
+        &__actions {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        &__action-row {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+        }
+    }
+    
+    label > span {
+        display: inline-block;
+        margin-top: 0.75rem;
+    }
+</style>

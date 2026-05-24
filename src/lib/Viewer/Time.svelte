@@ -1,7 +1,7 @@
 <script lang="ts">
     import { EntryTimeModel } from '$lib/model/entry';
 
-    let { times, currentTime, showAsTitle = false, textClass = '' }: { times: EntryTimeModel[], currentTime: Date, showAsTitle?: boolean, textClass?: string } = $props();
+    let { times, currentTime, textClass = '' }: { times: EntryTimeModel[], currentTime: Date, textClass?: string } = $props();
 
     let time = $derived.by(() => {
         let combinedTimes: { start: Date; end: Date }[] = [];
@@ -22,11 +22,15 @@
         return totalDuration;
     });
 
-    let hour = $derived(Math.floor(time / 3600 / 1000));
-    let minute = $derived(Math.floor((time % (3600 * 1000)) / 60000));
-    let second = $derived(Math.floor((time % (60000)) / 1000));
+    let formatedDuration = $derived.by(() => {
+         const safeDuration = Math.max(0, Math.abs(time));
+         const hour = Math.floor(safeDuration / 3600 / 1000);
+         const minute = Math.floor((safeDuration % (3600 * 1000)) / 60000);
+         const second = Math.floor((safeDuration % 60000) / 1000);
+         return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
+    });
 </script>
 
 {#if time > 0}
-<p class={`${showAsTitle ? 'text-lg font-bold' : ''} ${textClass}`.trim()}>{String(hour).padStart(2, '0')}:{String(minute).padStart(2, '0')}:{String(second).padStart(2, '0')}</p>
+<p class="md-typescale-body-large {textClass}">{formatedDuration}</p>
 {/if}

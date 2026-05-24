@@ -13,13 +13,41 @@
     });
 </script>
 
-<div class="rounded-lg shadow-lg bg-gray-800 mx-auto max-w-2xl min-w-md flex flex-col max-h-[100%] overflow-hidden">
-    <div class="flex-shrink-0">
+<div class="viewer">
+    <div class="viewer__title">
         <Title {entries} {currentTime} />
     </div>
-    <div class="flex-1 overflow-y-auto min-h-0">
+    <div class="viewer__list">
         {#each entries as entry}
             <Entry {entry} {currentTime}/>
         {/each}
     </div>
 </div>
+
+<style lang="scss">
+    .viewer {
+        display: flex;
+        flex-direction: column;
+        margin: 0 auto;
+        overflow: hidden;
+        
+        max-width: 42rem;
+        min-width: 20rem;
+        max-height: 100%;
+
+        border-radius: 1rem;
+
+        background-color: var(--md-sys-color-surface-container);
+
+        &__title {
+            flex-shrink: 0;
+        }
+
+        &__list {
+            flex: 1 1 auto;
+
+            overflow-y: auto;
+            min-height: 0;
+        }
+    }
+</style>
